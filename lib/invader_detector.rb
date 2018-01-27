@@ -1,18 +1,18 @@
 module Detector
-  class Invador
+  class Invader
 
     attr_reader :radar_image
 
     def initialize(radar_image)
       @radar_image = radar_image
-      @invador_exists = false
+      @invader_exists = false
     end
 
     def analysis
-      @invadors = known_invadors
-      @invadors.each do |invador|
-        @invador_exists = compare_result(invador)
-        break if @invador_exists
+      @invaders = known_invaders
+      @invaders.each do |invader|
+        @invader_exists = compare_result(invader)
+        break if @invader_exists
       end
       
       report
@@ -21,19 +21,19 @@ module Detector
 
     private
 
-    def known_invadors
-      file_of_invadors = Dir["./known_invadors/invador_*"]
-      invadors = []
-      file_of_invadors.each do |f|
-        invador = File.readlines(f).map(&:strip)
-        invadors.push invador
+    def known_invaders
+      file_of_invaders = Dir["./known_invaders/invader_*"]
+      invaders = []
+      file_of_invaders.each do |f|
+        invader = File.readlines(f).map(&:strip)
+        invaders.push invader
       end
-      invadors
+      invaders
     end
 
-    def characteristic_value(invador)
+    def characteristic_value(invader)
       char = {}
-      invador.each_with_index do |line, location|
+      invader.each_with_index do |line, location|
         if line.split("").uniq.size == 1
           char[line] = location
         end
@@ -41,8 +41,8 @@ module Detector
       char
     end
 
-    def compare_result(invador)
-      char_info = characteristic_value(invador)
+    def compare_result(invader)
+      char_info = characteristic_value(invader)
       char_value = char_info.keys.first
       char_location = char_info.values.first
       @on_the_image = []
@@ -54,7 +54,7 @@ module Detector
         # check to upper side
         0.upto(char_location) do |n|
           snippet = @radar_image[location - n][left_index..right_index]
-          if snippet == invador[char_location - n]
+          if snippet == invader[char_location - n]
             @on_the_image.push [snippet, location - n]
             next
           else
@@ -64,13 +64,13 @@ module Detector
         end
 
         # check to lower side
-        0.upto(invador.size - 1 - char_location) do |n|
+        0.upto(invader.size - 1 - char_location) do |n|
           if (location + n) > (@radar_image.size - 1)
             @on_the_image = []
             break
           end
           snippet = @radar_image[location + n][left_index..right_index]
-          if snippet == invador[char_location + n]
+          if snippet == invader[char_location + n]
             @on_the_image.push [snippet, location + n]
             next
           else
@@ -86,8 +86,8 @@ module Detector
     end
 
     def report
-      if @invador_exists
-        puts "Oh no! Invador is existing!"
+      if @invader_exists
+        puts "Oh no! invader is existing!"
         puts "---------------------------"
         puts image_snippet.inspect
       else
