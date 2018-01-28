@@ -18,7 +18,7 @@ class Testinvader < Minitest::Test
   end
 
   def test_get_characteristic_value_from_invader
-    fake_invader = ["--o--", "ooooo", "-o-o-"]
+    fake_invader = @detector.radar_image
     cinfo = @detector.send(:characteristic_value, fake_invader)
     assert_equal "ooooo", cinfo.keys.first
   end
@@ -61,4 +61,9 @@ class Testinvader < Minitest::Test
     assert_equal false, result
   end
 
+  def test_reture_true_if_part_matched
+    fake_invader = @detector.radar_image.map { |r| r[1..4] }
+    result = @detector.send(:compare_result, fake_invader)
+    assert_equal true, result
+  end
 end

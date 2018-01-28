@@ -47,36 +47,47 @@ module Detector
       char_location = char_info.values.first
       @on_the_image = []
       @radar_image.each_with_index do |line, location|
+        shift_right_times = 0
         left_index = line.index(char_value)
         next if left_index.nil?
-        right_index = left_index + char_value.size - 1
+        
+        # check to right side
+        while true
+          left_index = left_index + shift_right_times
+          right_index = left_index + char_value.size - 1
 
-        # check to upper side
-        0.upto(char_location) do |n|
-          snippet = @radar_image[location - n][left_index..right_index]
-          if snippet == invader[char_location - n]
-            @on_the_image.push [snippet, location - n]
-            next
-          else
-            @on_the_image = []
-            break
-          end
-        end
+          current_snippet = @radar_image[location][left_index..right_index]
+          break unless current_snippet == char_value
 
-        # check to lower side
-        0.upto(invader.size - 1 - char_location) do |n|
-          if (location + n) > (@radar_image.size - 1)
-            @on_the_image = []
-            break
+          # check to upper side
+          0.upto(char_location) do |n|
+            snippet = @radar_image[location - n][left_index..right_index]
+            if snippet == invader[char_location - n]
+              @on_the_image.push [snippet, location - n]
+              next
+            else
+              @on_the_image = []
+              break
+            end
           end
-          snippet = @radar_image[location + n][left_index..right_index]
-          if snippet == invader[char_location + n]
-            @on_the_image.push [snippet, location + n]
-            next
-          else
-            @on_the_image = []
-            break
+
+          # check to lower side
+          0.upto(invader.size - 1 - char_location) do |n|
+            if (location + n) > (@radar_image.size - 1)
+              @on_the_image = []
+              break
+            end
+            snippet = @radar_image[location + n][left_index..right_index]
+            if snippet == invader[char_location + n]
+              @on_the_image.push [snippet, location + n]
+              next
+            else
+              @on_the_image = []
+              break
+            end
           end
+
+          shift_right_times = shift_right_times + 1
         end
 
         break unless @on_the_image.empty?
